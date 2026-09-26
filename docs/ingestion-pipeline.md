@@ -129,7 +129,7 @@
 }
 ```
 
-**Минимально обязательные поля:**  
+**Минимально обязательные поля:**
 `chunk_id`, `document_id`, `source`, `filename`, `file_type`, `chunk_index`, `content`
 
 ---
@@ -140,22 +140,22 @@
 flowchart TD
     A[Файлы в data/documents] --> B[Document Loader]
     B --> C{Определение типа файла}
-    
+
     C -->|*.md| D[MarkdownParser]
     C -->|*.pdf| E[PdfParser]
     C -->|*.txt| F[TextParser]
-    
+
     D & E & F --> G[ParsedDocument]
     G --> H[Text Cleaner / Normalizer]
     H --> I[Chunker<br/>strategy из config]
     I --> J[Список DocumentChunk]
-    
+
     J --> K[Embedding Service<br/>Ollama]
     K --> L[Vector Store<br/>Chroma / pgvector]
-    
+
     J --> M[BM25 Index]
     J --> N[Metadata Store]
-    
+
     L & M & N --> O[Index Ready]
 ```
 
