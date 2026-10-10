@@ -1,17 +1,40 @@
 services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: local-rag-ollama
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+    networks:
+      - rag-network
+
   db:
     image: pgvector/pgvector:pg16
     container_name: local-rag-db
     environment:
-      POSTGRES_USER: rag
-      POSTGRES_PASSWORD: rag
-      POSTGRES_DB: rag
+      POSTGRES_USER: ${POSTGRES_USER:-rag}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rag}
+      POSTGRES_DB: ${POSTGRES_DB:-rag}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./migrations/01_init.sql:/docker-entrypoint-initdb.d/01_init.sql
     restart: unless-stopped
+    networks:
+      - rag-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-rag} -d ${POSTGRES_DB:-rag}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
+  ollama_data:
   pgdata:
+
+networks:
+  rag-network:
+    driver: bridge
