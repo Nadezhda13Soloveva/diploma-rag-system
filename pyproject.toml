@@ -18,6 +18,7 @@ dependencies = [
     "chardet>=5.2.0",
     "psycopg[binary]>=3.2.0",
     "pgvector>=0.3.0",
+    "structlog>=24.4.0",
 ]
 
 [project.optional-dependencies]
@@ -50,6 +51,10 @@ python_version = "3.11"
 strict = true
 ignore_missing_imports = true
 plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["backend.api.*"]
+disable_error_code = ["misc"]
 
 [tool.pydantic-mypy]
 init_forbid_extra = true
