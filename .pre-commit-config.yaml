@@ -15,9 +15,12 @@ repos:
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.13.0
     hooks:
-      - id: mypy
-        additional_dependencies:
-          - pydantic>=2.9.0
-          - pydantic-settings>=2.6.0
-          - types-PyYAML>=6.0.0
-        args: [--ignore-missing-imports]
+    - id: mypy
+      additional_dependencies:
+        - pydantic>=2.9.0
+        - pydantic-settings>=2.6.0
+        - types-PyYAML>=6.0.0
+        - pytest>=8.3.0
+      args:
+        - --ignore-missing-imports
+        - --config-file=pyproject.toml
