@@ -53,6 +53,13 @@ ignore_missing_imports = true
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
+module = [
+    "tests.*",
+    "test_*",
+]
+disable_error_code = ["misc"]
+
+[[tool.mypy.overrides]]
 module = ["backend.api.*"]
 disable_error_code = ["misc"]
 
@@ -60,3 +67,7 @@ disable_error_code = ["misc"]
 init_forbid_extra = true
 init_typed = true
 warn_required_dynamic_aliases = true
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
