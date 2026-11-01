@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Проверка работоспособности persistent Chroma"""
 
 from __future__ import annotations
@@ -6,56 +5,65 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-# чтобы можно было запускать скрипт из корня проекта
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from backend.config import settings
+from backend.ingestion.chunker.base import DocumentChunk
 from backend.stores.chroma_store import ChromaVectorStore
 
 
 def main() -> None:
     print("Chroma persistent check")
-    print(f"persist_directory: {settings.vector_store.persist_directory}")
-    print(f"collection_name: {settings.vector_store.collection_name}")
+    print(f"persist_directory : {settings.vector_store.persist_directory}")
+    print(f"collection_name : {settings.vector_store.collection_name}")
 
     store = ChromaVectorStore(
         persist_directory=settings.vector_store.persist_directory,
         collection_name=settings.vector_store.collection_name,
     )
 
-    # 1. очистка (чтобы проверка была повторяемой)
-    store.reset()
-    assert store.count() == 0, "Коллекция должна быть пустой после reset"
-    print("[OK] reset / count=0")
+    store.delete_collection()
+    assert store.count() == 0, "Коллекция должна быть пустой после delete_collection"
+    print("[OK] delete_collection / count=0")
 
-    # 2. вставка тестовых данных
     dim = settings.embedding.dimension
-    ids = ["chunk-1", "chunk-2"]
-    documents = [
-        "Локальный RAG на Ollama и Chroma",
-        "PostgreSQL с расширением pgvector",
+    chunks = [
+        DocumentChunk(
+            content="Локальный RAG на Ollama и Chroma",
+            chunk_id="chunk-1",
+            document_id="doc-1",
+            source="test1.md",
+            filename="test1.md",
+            file_type="md",
+            chunk_index=0,
+            total_chunks=2,
+        ),
+        DocumentChunk(
+            content="PostgreSQL с расширением pgvector",
+            chunk_id="chunk-2",
+            document_id="doc-1",
+            source="test2.md",
+            filename="test2.md",
+            file_type="md",
+            chunk_index=1,
+            total_chunks=2,
+        ),
     ]
     embeddings = [
         [0.1] * dim,
         [0.9] * dim,
     ]
-    metadatas = [
-        {"source": "test1.md", "chunk_index": 0},
-        {"source": "test2.md", "chunk_index": 1},
-    ]
 
-    store.add(ids=ids, documents=documents, embeddings=embeddings, metadatas=metadatas)
+    store.add_documents(chunks, embeddings)
     assert store.count() == 2, "Ожидалось 2 документа"
-    print("[OK] add / count=2")
+    print("[OK] add_documents / count=2")
 
-    # 3. поиск
-    query_embedding = [0.1] * dim
-    results = store.similarity_search(query_embedding, top_k=2)
+    results = store.similarity_search([0.1] * dim, top_k=2)
     assert len(results) > 0, "Поиск должен вернуть результаты"
-    print(f"[OK] similarity_search -> {len(results)} results")
-    print(f" top id: {results[0]['id']}, distance: {results[0]['distance']:.4f}")
+    top = results[0]
+    print(f"[OK] similarity_search → {len(results)} results")
+    print(f"     top id: {top.chunk_id}, score: {top.score:.4f}, rank: {top.rank}")
 
-    # 4. проверка persist: создаём новый экземпляр того же пути
     store2 = ChromaVectorStore(
         persist_directory=settings.vector_store.persist_directory,
         collection_name=settings.vector_store.collection_name,
@@ -63,7 +71,7 @@ def main() -> None:
     assert store2.count() == 2, "Данные должны сохраниться между перезапусками"
     print("[OK] persist between restarts")
 
-    print("\nВсе проверки Chroma пройдены")
+    print("\nВсе проверки Chroma пройдены успешно")
 
 
 if __name__ == "__main__":

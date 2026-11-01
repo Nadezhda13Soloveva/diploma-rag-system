@@ -54,14 +54,11 @@ ignore_missing_imports = true
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-module = [
-    "tests.*",
-    "test_*",
-]
+module = "tests.*"
 disable_error_code = ["misc"]
 
 [[tool.mypy.overrides]]
-module = ["backend.api.*"]
+module = "backend.api.*"
 disable_error_code = ["misc"]
 
 [tool.pydantic-mypy]
