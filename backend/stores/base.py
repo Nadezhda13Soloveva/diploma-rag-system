@@ -23,6 +23,9 @@ class RetrievalResult:
     title: str | None = None
     section: str | None = None
     distance: float | None = None  # сырое расстояние из backend
+    vector_rank: int | None = None
+    bm25_rank: int | None = None
+    final_rank: int | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
