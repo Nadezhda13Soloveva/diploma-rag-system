@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from datetime import UTC, datetime
 from pathlib import Path
 
 from backend.config import settings
@@ -158,6 +159,7 @@ class Indexer:
                     "title": parsed.metadata.get("title"),
                     "page_count": parsed.metadata.get("page_count"),
                 },
+                indexed_at=datetime.now(UTC).isoformat(),
             )
         )
         return len(chunks), False

@@ -18,10 +18,11 @@ class DocumentRecord:
     file_type: str
     chunk_ids: list[str] = field(default_factory=list)
     metadata: dict[str, Any] = field(default_factory=dict)
+    indexed_at: str | None = None  # ISO-8601
 
 
 class MetadataStore:
-    """JSON-хранилище метаданных документов (согласованность с vector/BM25)."""
+    """JSON-хранилище метаданных документов (согласованность с vector/BM25)"""
 
     def __init__(self, path: str | Path = "./data/index/metadata.json") -> None:
         self.path = Path(path)
