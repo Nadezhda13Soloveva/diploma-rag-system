@@ -3,7 +3,7 @@ from __future__ import annotations
 from fastapi import FastAPI
 
 from backend.api.middleware import RequestIdMiddleware
-from backend.api.routes import ask, health, reindex
+from backend.api.routes import ask, documents, health, reindex
 from backend.observability.logging import setup_logging
 
 setup_logging(json_logs=True)
@@ -18,6 +18,7 @@ app.add_middleware(RequestIdMiddleware)
 app.include_router(health.router)
 app.include_router(reindex.router)
 app.include_router(ask.router)
+app.include_router(documents.router)
 
 
 @app.get("/")
