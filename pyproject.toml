@@ -69,3 +69,6 @@ warn_required_dynamic_aliases = true
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
+markers = [
+    "integration: tests that need external services (Ollama, Docker)",
+]
